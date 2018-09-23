@@ -1,7 +1,7 @@
 ---
 title: "Project 1"
 author: "Elaine Kaye Kearney"
-date: "9/15/2018"
+date: "9/24/2018"
 output: html_document
 ---
 
@@ -9,9 +9,9 @@ output: html_document
     library(tidyverse)
     ```
 
-### Is the growth of the circumference of orange trees uniform across 5 different trees over time?
+### 1: Is the growth of the circumference of orange trees uniform across 5 different trees over time?
 
-The dataset `Orange` available in `R` is a dataset including 3 variables: 
+The dataset `Orange` available in `R`, originally referenced in an exercise in the 1998 "Applied Regression Analysis" textbook by Draper and Smith, is a dataset including 3 variables: 
 
 * `Tree`: an ordered ID variable for each tree, ranging from 1 to 5.  The specific ordering of this variable refers to increasing maximum diameter.
 * `age`: the number of days since December 31, 1968, which is used to refer to the age of the tree.
@@ -27,26 +27,29 @@ A brief look at the dataset by `Tree` reveals that the circumference of each tre
 * age = 1372
 * age = 1582
 
-Also, the following plot shows these three age timepoints for each tree.
+Also, the following plot shows these age timepoints for each tree.
 
 ```{r}
 Orange %>%
   ggplot() +
   geom_point(mapping = aes(x = Tree, y = age)) + 
-  ylab("Age")
+  ylab("Age (days since December 31, 1968)") +
+  xlab("Tree ID")
 ```
 
 Thus, this yields my main research questions for this dataset as
 
 #### Do these 5 trees grow in circumference at the same rate? Which is the fastest growing tree? Which is the slowest growing tree?
 
-In order to address these research questions I will construct a spaghetti plot of the circumference over time for the 5 trees.  The first time I created the plot, I found that the ordering of `Tree` in the legend was not numerically in order, which I feel would not be visually appealing for a reader.  Therefore, I needed to reset the levels of `Tree` to the correct ordering of the numbers (i.e., 1 to 5):
+The importance of this analysis is that it can reveal typical growing patterns of orange trees so that the pattern of a new tree can be compared to these typical patterns, and it can also provide information about the health of both the orchard as a whole, as well as individual trees relative to the orchard's growth.  This is particularly important in areas where growing oranges is a substantial part of the economy.  
+
+In order to address these research questions I will construct a spaghetti plot of the circumference over time for the 5 trees.  The first time I created the plot, I found that the ordering of `Tree` in the legend was not in order numerically.  I feel that the having the trees in numerical order in the legend would be visually appealing for a reader.  Therefore, Is reset the levels of `Tree` to the correct ordering of the identification numbers (i.e., 1 to 5):
 
 ```{r}
 Orange$Tree <- factor(Orange$Tree, levels = c("1","2","3","4","5"))
 ```
 
-Now I will construct the spaghetti plot with correct ordering of `Tree` in the legend.
+Now I will construct the spaghetti plot, or a plot with a line for each tree showing growth over time, with correct ordering of `Tree` in the legend.
 
 ```{r}
 Orange %>% 
@@ -54,13 +57,13 @@ Orange %>%
   ggplot(mapping = aes(age, circumference, color = Tree)) +
   geom_point() + 
   geom_line() + 
-  xlab("Age") + 
-  ylab("Circumference")
+  xlab("Age (days since December 31, 1968)") + 
+  ylab("Circumference (mm)")
 ```
 
-On first glance I notice two distinct patterns of growth of the trees.  First, the growth of the trees begans to differ strongly after the second time point.  Is this a typical growing pattern? First, all five trees do not grow as much in the time between the next-to-last time point and the last time point.  Have these trees reached their maximum circumference?  
+On first glance I noticed two distinct patterns of growth of the trees.  First, the growth of the trees begans to differ strongly after the second time point.  Is this a typical growing pattern, meaning, is there a large growth spurt for orange trees after 484 days? Second, all five trees do not grow as much in the last time interval as they grow during other time intervals.  Have these trees reached their maximum circumference?  
 
-The spaghetti plot indicates that Tree 4 has the largest circumference at the end of the study and Tree 3 has the smallest circumference at the end of the study.  However, this doesn't really answer my original research question of "Which is the fastest growing tree?" and "Which is the slowest growing tree?" This could be determined by finding the slope of the line of best fit for the growth of each tree.
+The spaghetti plot indicates that Tree 4 has the largest circumference at the end of the study and Tree 3 has the smallest circumference at the end of the study.  However, this doesn't really answer my original research questions of "Which is the fastest growing tree?" and "Which is the slowest growing tree?" This could be determined by finding the slope of the line of best fit for the growth of each tree.
 
 ```{r}
 Orange %>% 
@@ -68,26 +71,28 @@ Orange %>%
   ggplot(mapping = aes(age, circumference, color = Tree)) +
   geom_point() +
   geom_smooth(method='lm', se = FALSE)  + 
-  xlab("Age") + 
-  ylab("Circumference")
+  xlab("Age (days since December 31, 1968)") + 
+  ylab("Circumference (mm)")
 ```
 
 From this plot I can see that Tree 4 is indeed the fastest growing tree, as its slope of growth is larger than any other tree, and Tree 3 is the slowest growing tree, as its slope of growth is smaller than any other tree.
 
-My brief analysis into the growth of these orange trees has brought up some other questions.  What is the relationship between the circumference of these trees and the height of these trees?  Why does the documentation state that the ordered factor given to each tree is related to increasing maximum diameter, if I found that Tree 4 was the largest at the last time point, as opposed to what I would have expected, which would have been Tree 5.
+My brief analysis into the growth of these orange trees has brought up some other questions.  What is the relationship between the circumference of these trees and the height of these trees?  Why does the documentation state that the ordered factor given to each tree is related to increasing maximum diameter, if I found that Tree 4 was the largest at the last time point, as opposed to what I would have expected, which would have been Tree 5?
 
-The importance of this analysis is that it can reveal typical growing patterns of orange trees so that the pattern of a new tree can be compared to these typical patterns.  If the pattern of a certain tree deviates strongly from a "typical" growing pattern, this of course results in the question of "Why?" Is there a problem with the soil? Could a disease have striken this orchard of trees?  Was my original data about typical growing patterns wrong?  With a larger dataset, and more information about the health of the particular orange trees, I might be able to address these questions, and more.
+As I mentioned earlier in this post, the importance of this analysis is that it can reveal typical growing patterns of orange trees so that the pattern of a new tree can be compared to these typical patterns.  If the pattern of a certain tree deviates strongly from a "typical" growing pattern, this of course results in the question of "Why?" Is there a problem with the soil? Could a disease have striken this orchard of trees?  Was my original data about typical growing patterns wrong?  With a larger dataset, and more information about the health of the particular orange trees, I might be able to address these questions, and more!
 
-### What are the distributions of murder, assault, and rape arrests by percent of urban population groupings in the United States?
+### 2: What are the distributions of murder, assault, and rape arrests by percent of urban population groupings in the United States?
 
-The dataset `USArrests` available in `R` is a dataset including 4 variables and 50 observations, one observation for each state in the US:
+The dataset `USArrests` available in `R` is a dataset including 4 variables and 50 observations, one observation for each state in the US.  The variables in this dataset are as follows:
 
 * `Murder`: number of murder arrests per 100,000 residents
 * `Assault`: number of assault arrests per 100,000 residents
 * `UrbanPop`: percent of the population living in urban areas
 * `Rape`: number of rape arrests per 100,000 residents
 
-These data are from 1973, and were recorded in the 1975 World Almanac and Book of facts. I am interested in the distributions of murder, assault, and rape arrests per 100,000, after grouping states by percent of the population living in urban areas.  I am interested in comparing those states with less than half of the population living in urban areas to those states with more than half of the population living in urban areas.  I first need to split the dataset into these two groupings:
+These data are from 1973, and were recorded in the 1975 World Almanac and Book of facts. I am interested in the distributions of murder, assault, and rape arrests per 100,000 residents, after grouping states by percent of the population living in urban areas.  Performing this analysis is important because it can help to determine which states have the highest counts of murder, assault, and rape arrests per 100,000 residents, and if this is somehow correlated with the percent of the population living in urban areas.  If a relationship is found, then this can help the government to provide greater support to those areas with higher counts of arrests, and also begin the process of understanding why this relationship exists. 
+
+I am interested in comparing those states with less than half of the population living in urban areas to those states with more than half of the population living in urban areas.  To perform this analysis, I first need to split the dataset into two groupings:
 
 ```{r}
 less_urban <- USArrests %>%
@@ -101,21 +106,21 @@ more_urban <- USArrests %>%
 dim(more_urban)
 ```
 
-However, doing this grouping results in only 9 states in the `less_urban` group, with the other 41 states in the `more_urban` group.  Maybe instead it would be better to split down the mean (however, technically the median would produce almost identically sized groups).
+However, doing this grouping results in only 9 states in the `less_urban` group, with the other 41 states in the `more_urban` group.  Maybe instead it would be better to split down the mean:
 
 ```{r}
 rural <- USArrests %>%
   filter(UrbanPop <= mean(UrbanPop))
-dim(less_urban)
+dim(rural)
 ```
 
 ```{r}
 urban <- USArrests %>%
   filter(UrbanPop > mean(UrbanPop))
-dim(more_urban)
+dim(urban)
 ```
 
-Now I have 26 in the `rural` group and the other 24 in the `urban` group, so I am ready to start the visualization, first by making a new variable to represent the group the observation belongs to:
+Now I have 22 in the `rural` group and the other 28 in the `urban` group, so I am ready to start the visualization, first by making a new variable to represent the group the observation belongs to:
 
 ```{r}
 USArrests %>%
@@ -123,7 +128,8 @@ USArrests %>%
   ggplot() +
   geom_histogram(mapping = aes(x = Murder, stat(density)), bins = 5) +
   facet_grid(population_type ~ .) + 
-  ylab("Density")
+  ylab("Density") + 
+  xlab("Murder arrests per 100,000 residents")
 ```
 
 ```{r}
@@ -132,7 +138,8 @@ USArrests %>%
   ggplot() +
   geom_histogram(mapping = aes(x = Assault, stat(density)), bins = 5) +
   facet_grid(population_type ~ .) + 
-  ylab("Density")
+  ylab("Density") + 
+  xlab("Assault arrests per 100,000 residents")
 ```
 
 ```{r}
@@ -141,7 +148,8 @@ USArrests %>%
   ggplot() +
   geom_histogram(mapping = aes(x = Rape, stat(density)), bins = 5) +
   facet_grid(population_type ~ .) + 
-  ylab("Density")
+  ylab("Density") + 
+  xlab("Rape arrests per 100,000 residents")
 ```
 
 These plots are nice for comparing the distributions across the urban and rural populations that I have defined, however I would like to compare the subgroup distributions to the distribution of all the states together.  It is important to scale the x-axis and y-axis for these plots to match for easy comparison.  Also, it would be nice to have all the distributions for the three different variables and three groups (all, rural, and urban) for comparison in one plot.  It requires a lot of code to achieve the desired figure, however this one figure allows many conclusions to be made.
@@ -224,24 +232,24 @@ print(p21, vp = viewport(layout.pos.row = 3, layout.pos.col = 2))
 print(p22, vp = viewport(layout.pos.row = 3, layout.pos.col = 3))
 ```
 
-This figure reveals several interesting phenomenon in this particular dataset.  It is important to note that my hypothesis going into this analysis was that there would be more murder, assault, and rape arrests per 100,000 residents in the so defined "urban" states than the "rural" states.  That is, I would see taller bars for the larger counts for murder, assault, and rape in the urban plots compared to the rural plots.  This was not necessarily evident in the three single plots produced above.   However, now with all states together to compare, I am able to see more differences in the so defined "urban" and "rural" states.
+Note that the counts x-axis is in number of arrests for each crime per 100,000 residents.
+
+This figure reveals several interesting phenomenon in this particular dataset.  It is important to note that my hypothesis going into this analysis was that there would be more murder, assault, and rape arrests per 100,000 residents in the so defined "urban" states than the "rural" states.  That is, I would see taller bars for the larger counts for murder, assault, and rape arrests in the urban plots compared to the rural plots.  This was not necessarily evident in the three single plots produced above.   However, now with all states together to compare, I am able to see more differences in the so defined "urban" and "rural" states.
 
 For murder arrests I see that there is a gap in the counts for the rural states.  That is, there are no states in this group with between 10 and 12 murder arrests per 100,000 residents. This may suggest that I did not do a good job of separating my data, and that those states with 12 murder arrests per 100,000 residents or more should have been in the urban grouping, or it could just suggest that this data is very sparse (we only have a single value for each state for one year), and so a larger dataset with counts over the years, or at different times during the year, would be more useful.
 
-For assault arrests I see there are somewhat taller bars for the lower counts of assault arrests per 100,000 residents in the rural states, compared to the urban states.  In fact, the densities in lower counts of assault arrests per 100,000 residents in the rural states are smaller than the densities in lower counts of assault arrests per 100,000 residents in all the states together.  This does provide some support of my hypothesis that there were smaller counts of assault in the rural states than the urban states, however we would need to some formal hypothesis testing to see if this evidence is enough to demonstrate that the rural and urban states are different with respect to assault arrests per 100,000 residents.
+For assault arrests I see there are somewhat taller bars for the lower counts of assault arrests per 100,000 residents in the rural states, compared to the urban states.  In fact, the densities in lower counts of assault arrests per 100,000 residents in the rural states are smaller than the densities in lower counts of assault arrests per 100,000 residents in all the states together.  This does provide some support of my hypothesis that there are smaller counts of assault in the rural states than the urban states, however we would need to do some formal hypothesis testing to see if this evidence is enough to demonstrate that the rural and urban states are different with respect to assault arrests per 100,000 residents.
 
-I see a similar pattern for rape arrests in that there are somewhat taller bars for the lower counts of rape arrest per 100,000 residents in the rural states, compared to the urban states, and somewhat taller bars for the higher counts of rape arrests per 100,000 residents in the urban states, comapred to the rural states.  Again, we would need to some formal hypothesis testing to see if this evidence is enough to demonstrate that the rural and urban states are different with respect to rape arrests per 100,000 residents.
+I see a similar pattern for rape arrests in that there are somewhat taller bars for the lower counts of rape arrest per 100,000 residents in the rural states, compared to the urban states, and somewhat taller bars for the higher counts of rape arrests per 100,000 residents in the urban states, compared to the rural states.  Again, we would need to do some formal hypothesis testing to see if this evidence is enough to demonstrate that the rural and urban states are different with respect to rape arrests per 100,000 residents.
 
-For further analysis, I am very interested in how these counts of arrests change over time.  Also, it would be useful to investigate another method of splitting the states into rural and urban areas, as opposed to just splitting based on percent of the population in urban areas. Finally, classifying an entire state into urban or rural is really not realistic.  Consider North Carolina: some parts are much more rural than others, so it is not necessarily reasonable to classify the entire state as rural or urban.  Therefore, another analysis with counts of arrests by regions within a state might be more reasonable for distinguishing between these counts of arrest by rural or urban regions.  This information is very important for law enforcement officers who are interested in where to station more officers and/or more resources and attention.  Specifically, if there is a region with very high counts, this region may not be getting enough attention, and performing analyses such as these can help to identify these regions and get them the needed support.
+For further analysis, I am very interested in how these counts of arrests change over time.  Also, it would be useful to investigate another method of splitting the states into rural and urban areas, as opposed to just splitting based on percent of the population in urban areas. Finally, classifying an entire state into urban or rural is really not realistic.  Consider North Carolina: some parts are much more rural than others, so it is not necessarily reasonable to classify the entire state as rural or urban.  Therefore, another analysis with counts of arrests by regions within a state might be more reasonable for distinguishing between these counts of arrest by rural and urban regions.  This information is very important for law enforcement officers who are interested in where to station more officers and/or more resources and attention.  Specifically, if there is a region with very high counts, this region may not be getting enough attention, and performing analyses such as these can help to identify these regions and get them the needed support.
 
-### Is the trend of gas consumption throughout a year similar across years in the UK?
+### 3: Is the trend of gas consumption throughout a year similar across years in the UK?
 
-The dataset `UKgas` available in `R` is a dataset including a quarterly time series of UKgas consumption from the first quarter of 1960 to the fourth quarter of 1986, in millions of therms.  To start, this dataset just has one variable, which is the gas consumption.  I added two other variables to this dataset:
+The dataset `UKgas` available in `R` is a dataset including a quarterly time series of UKgas consumption from the first quarter of 1960 to the fourth quarter of 1986, in millions of therms.  The source of this dataset is the book "Time Series Analysis by State Space Methods" by Durbin and Koopman.  To start, this dataset just has one variable, which is the gas consumption.  I added two other variables to this dataset:
 
 * `Quarter`: the quarter of the year (1,2,3, or 4)
 * `Year`: the year (between 1960 and 1986, inclusive)
-
-The variable are defined in the dataset is `x` which refers to the consumption.
 
 ```{r}
 df_UKgas <- as.data.frame(UKgas)
@@ -249,51 +257,53 @@ df_UKgas$Quarter <- 1:4
 df_UKgas$Year <- as.factor(rep(1960:1986, each = 4))
 ```
 
-I am interested in investigating the trend of gas consumption throughout a year (or throughout the quarters of year), and looking to see if this trend is similar over the years in the dataset.  A simple plot of this data would be the following plot of consumption over time, using the original dataset which is simply a time series.  Note, the following plot is suggested by the documentation:
+I am interested in investigating the trend of gas consumption throughout a year (or throughout the quarters of year), and looking to see if this trend is similar over the years in the dataset.  This analysis is useful to gas companies in predicting demand for the coming year, as well as identifying years with exceptional usage which can spark investigation into why this was the case and if actions need to be taken to reduce consumption.  
+
+A simple plot of this data would be the following plot of consumption over time, using the original dataset which is simply a time series.  Note, the following plot is suggested by the documentation:
 
 ```{r}
-plot(UKgas)
+plot(UKgas, ylab = "Gas Consumption (in millions of therms)")
 ```
 
 From this plot it does appear that there is a distinct yearly trend.  I would like to investigate this further by plotting all years as different lines, with the y-axis as the consumption and x-axis as the quarters.  This is similar to the spaghetti plot I demonstrated using the first dataset:
 
-```{r}
+```{r, message = FALSE}
 df_UKgas %>%
   group_by(Year) %>%
   ggplot(mapping = aes(x = Quarter, y = x, color = Year)) +
   geom_point() +
   geom_line() +
-  ylab("Consumption")
+  ylab("Gas Consumption (in millions of therms)")
 ```
 
-This plot does demonstrate that there is a yearly trend and it involves high consumption in the first quarter, and then decreasing consumption until the three quarter, and then finally higher consumption in the fourth quarter compared to the third quarter.  This is likely due to the use of gas for heating during the colder months which correspond to the first and second quarters.
+This plot does demonstrate that there is a yearly trend and it involves high consumption in the first quarter, and then decreasing consumption until the third quarter, and then finally higher consumption in the fourth quarter compared to the third quarter.  This is likely due to the use of gas for heating during the colder months which correspond to the fourth and first quarters.
 
-One way I could approve this plot could be to do some normalizing and scaling to more clearly see if the percent change in consumption from quarter to quarter is the same for all years.  This would help to adjust for the much higher consumption in the later years compared to the earlier years, and would demonstrate if their is higher percent change in consumption in later years compared to earlier years.
+One way I could improve this plot could be to do some normalizing and scaling to more clearly see if the percent change in consumption from quarter to quarter is the same for all years.  This would help to adjust for the much higher consumption in the later years compared to the earlier years, and would demonstrate if there is higher percent change in consumption in later years compared to earlier years.
 
 These data, and the analysis of trends of consumption from year to year and quarter to quarter is helpful to gas companies in identifying if they have adequate supply for the forecasted demands.  Moreover, if there is much higher consumption in a certain quarter than would be expected compared to the consumption trends of previous years, this might suggest an issue: maybe a leak, or the population is using the gas at an unsustainable rate and this needs to be addressed.  However, this analysis would not truly be complete without comparing these data to other data about the population, like population growth, and other energy usage trends.  
 
-### Is there a relationship between percent of males involved in agriculture as an occupation in an area and the fertility of a region?
+### 4: Is there a relationship between percent of males involved in agriculture as an occupation in an area and the fertility of a region?
 
-The dataset `swiss` available in `R` is a dataset including a standardized fertility measures, as well as socio-economic indicators, for each of 47 provinces in Switzerland around 1888.  The variables in this dataset are as follows:
+The dataset `swiss` available in `R` is a dataset including a standardized fertility measures, as well as socio-economic indicators, for each of 47 provinces in Switzerland around 1888.  The source of the data is the book "Data Analysis and Regression: A Second Course in Statistics" by Mosteller and Tukey.  The variables in this dataset are as follows:
 
 * `Fertility`: common standardized fertility measure
 * `Agriculture`: percent of males involved in agriculture as an occupation
 * `Examination`: percent of draftees receiving highest mark on army examination
-* `Education`: percent of eduction beyond primary school for draftees
+* `Education`: percent of education beyond primary school for draftees
 * `Catholic`: percent of the population identifying as Catholic, as opposed to Protestant
 * `Infant.Mortality`: percent of babies who are born alive and live less than one year
 
-From these data I am interested in investigating a relationship between percent of males involved in agriculture as an occupation in an area and the fertility of a region.  One way this could be investigated is through 
+From these data I am interested in investigating a relationship between percent of males involved in agriculture as an occupation in an area and the fertility of a region, which can help to identify potentially harmful occupations, or potentially help to explain why some regions are growing in population size at a faster rate than other regions.
+
+One way this could be investigated is through 
 the following plot where the distribution of fertility is plotted by agriculture.  In order to achieve this plot, I first needed to split the regions into two groups: those with at least 50% of the males involved in agriculture as an occupation, and those with less than 50% of the males involved in agriculture as an occupation:
-
-
 
 ```{r}
 swiss %>%
-  mutate(more_agriculture = ifelse(Agriculture >= 50, "More Agriculture", "Less Agriculture")) %>%
+  mutate(Agriculture.Group = ifelse(Agriculture >= 50, "More Agriculture", "Less Agriculture")) %>%
   ggplot() +
   geom_histogram(mapping = aes(x = Fertility, stat(density)), bins = 5) +
-  facet_grid(. ~ more_agriculture) + 
+  facet_grid(. ~ Agriculture.Group) + 
   ylab("Density")
 ```
 
@@ -305,23 +315,32 @@ This could also be investigated in a scatterplot of percent of males involved in
 
 ```{r}
 swiss %>%
-  mutate(more_agriculture = ifelse(Agriculture >= 50, "More Agriculture", "Less Agriculture")) %>%
+  mutate(Agriculture.Group = ifelse(Agriculture >= 50, "More Agriculture", "Less Agriculture")) %>%
   ggplot() +
-  geom_point(mapping = aes(x = Agriculture, y = Fertility, color = more_agriculture)) + 
-  geom_smooth(mapping = aes(x = Agriculture, y = Fertility, color = more_agriculture), method = "lm", se = FALSE) +   geom_smooth(mapping = aes(x = Agriculture, y = Fertility), method = "lm", se = FALSE)
+  geom_point(mapping = aes(x = Agriculture, y = Fertility, color = Agriculture.Group)) + 
+  geom_smooth(mapping = aes(x = Agriculture, y = Fertility, color = Agriculture.Group), 
+              method = "lm", se = FALSE) +   
+  geom_smooth(mapping = aes(x = Agriculture, y = Fertility), method = "lm", se = FALSE) + 
+  xlab("% of males involved in agriculture as an occupation")
 ```
-From this plot and the line of best fit, it does appear that there is a moderate positive relationship between percent of males involved in agriculture as an occupation and fertility in both groups of provinces, with the relationship actually being stronger in the less agriculture group than the more agriculture group.  This relationship would have been missed if I had just stuck to the original plot comparing the distributions.  Overall though, across both groups of provinces, there is a moderate positive relationship between percent of males involved in agriculture as an occupation and fertility, meaning that more men involved in agriculture is correlated moderately with the fertility measures.
 
-You may be wondering: Why is this information useful? One main reason is because if we can show that there is a correlation between the percent of males involved in agriculture and the fertility of the province, this may indicate that in those provinces where more men are involved in other occupations as opposed to agriculture, the men are being exposed to something harmful that impairs fertility.  Or it could be that regions with agriculture as a primary occupation for men have a greater food supply, and so they tend to have more babies.  Or, maybe I am too hasty to make that conclusion, and instead I should be considered the demographics of the regions, and those regions without agriculture as a primary occupation for men are in more urban areas, and somehow this has a correlation with fertility.  Something else I should probably also consider is the population size of these provinces.  As of right now I am only looking at percent of the male population involved in agriculture, however I don't know for sure how many men each percent maps too, and it may be vastily different across provinces.  Finally, to really get the whole picture here, I should probably look into infant mortality of the region as even if fertility is higher, infant mortality of the region could also be higher.  I will finally improve this plot by changing the shape of the markers according to infant mortality.
+From this plot and the lines of best fit, it does appear that there is a moderate positive relationship between percent of males involved in agriculture as an occupation and fertility in both groups of provinces, meaning that the greater percentage of males involved in agriculture as an occupation, the higher the fertility measure.  This relationship is actually stronger in the group with less than 50% of the males involved in agriculture as an occupation compared to the group with more than 50% of the males involved in agriculture as an occupation.  This relationship would have been missed if I had just stuck to the original plot comparing the distributions.  Overall though, across both groups of provinces, there is a moderate positive relationship between percent of males involved in agriculture as an occupation and fertility, meaning that more men involved in agriculture is correlated moderately with higher fertility measures.
+
+You may be wondering: Why is this information useful? One main reason is because if we can show that there is a correlation between the percent of males involved in agriculture and the fertility of the province, this may indicate that in those provinces where more men are involved in other occupations as opposed to agriculture, the men are being exposed to something harmful that impairs fertility.  Or it could be that regions with agriculture as a primary occupation for men have a greater food supply, and so they tend to have more babies.  Or, maybe I am too hasty to make that conclusion, and instead I should be considering the demographics of the regions, and those regions without agriculture as a primary occupation for men are in more urban areas, and somehow this has a correlation with fertility.  Something else I should probably also consider is the population size of these provinces.  As of right now I am only looking at percent of the male population involved in agriculture, however I don't know for sure how many men each percent maps too, and it may be vastily different across provinces.  Finally, to really get the whole picture here, I should probably look into infant mortality of the region as even if fertility is higher, infant mortality of the region could also be higher.  I will finally improve this plot by changing the shape of the markers according to infant mortality.
 
 ```{r}
 swiss %>%
-  mutate(more_agriculture = ifelse(Agriculture >= 50, "More Agriculture", "Less Agriculture"), infant_mortality_group = cut_width(Infant.Mortality,5)) %>%
+  mutate(Agriculture.Group = ifelse(Agriculture >= 50, "More Agriculture", "Less Agriculture"), 
+         Infant.Mortality.Group = cut_width(Infant.Mortality,5)) %>%
   ggplot() +
-  geom_point(mapping = aes(x = Agriculture, y = Fertility, color = more_agriculture, shape = infant_mortality_group)) + 
-  geom_smooth(mapping = aes(x = Agriculture, y = Fertility, color = more_agriculture), method = "lm", se = FALSE) +   geom_smooth(mapping = aes(x = Agriculture, y = Fertility), method = "lm", se = FALSE)
+  geom_point(mapping = aes(x = Agriculture, y = Fertility, color = Agriculture.Group, 
+                           shape = Infant.Mortality.Group)) + 
+  geom_smooth(mapping = aes(x = Agriculture, y = Fertility, color = Agriculture.Group), 
+              method = "lm", se = FALSE) +   
+  geom_smooth(mapping = aes(x = Agriculture, y = Fertility), method = "lm", se = FALSE) + 
+  xlab("% of males involved in agriculture as an occupation")
 ```
 
-Wow! There are some provinces with a higher percent of the male population involved in agriculture that also are in the higher infant mortality group.  Without adding this information to the plot, I may have made the assumption that the provinces with a higher percent of the male population involved in agriculture have higher fertility and therefore greater population growth than other provinces, when instead these same provinces may be experiencing high infant mortality.  Again, I still don't have information about the relative sizes of these provinces, and this is important information to learning about their true population growth.  Also, it would be helpful to make similar plots with the other variables provided in the dataset to see if these are more strongly correlated with fertility compared to agriculture.
+Wow! There are some provinces with a higher percent of the male population involved in agriculture that also are in the higher infant mortality group.  Without adding this information to the plot, I may have made the assumption that the provinces with a higher percent of the male population involved in agriculture have higher fertility and therefore greater population growth than other provinces, when instead these same provinces may be experiencing high infant mortality, and therefore may not be experiencing greater population growth compared to other provinces.  Again, I still don't have information about the relative sizes of these provinces, and this is important information to learning about their true population growth.  Also, it would be helpful to make similar plots with the other variables provided in the dataset to see if these are more strongly correlated with fertility compared to agriculture.
 
 
